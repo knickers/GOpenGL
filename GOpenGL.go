@@ -1,10 +1,10 @@
-package openGl
+package GOpenGL
 
 import (
 	"fmt"
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
-	"openGl/camera"
+	"GOpenGL/camera"
 	"os"
 	"time"
 )

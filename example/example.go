@@ -4,10 +4,10 @@ import (
 	"fmt"
 	gl "github.com/chsc/gogl/gl21"
 	"github.com/jteeuwen/glfw"
-	"openGl"
-	//"openGl/camera"
-	"openGl/colors"
-	"openGl/shapes"
+	"GOpenGL"
+	//"GOpenGL/camera"
+	"GOpenGL/colors"
+	"GOpenGL/shapes"
 	"os"
 	"os/signal"
 )
@@ -17,10 +17,10 @@ const (
 	gY = 480
 )
 
-var G *openGl.OpenGl
+var G *GOpenGL.OpenGl
 
 func main() {
-	G = openGl.New("Empty 3d Environment", gX, gY)
+	G = GOpenGL.New("Empty 3d Environment", gX, gY)
 
 	G.Set3dCallback(display3d)
 	G.Set2dCallback(display2d)
