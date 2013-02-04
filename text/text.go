@@ -5,11 +5,11 @@ import (
 	gl "github.com/chsc/gogl/gl21"
 )
 
-func Text(x, y, z float32, str string) {
+func String(x, y, z float64, str string) {
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 	gl.Enable(gl.BLEND)
 
-	gl.RasterPos3f(x, y, z)
+	gl.RasterPos3d(gl.Double(x), gl.Double(y), gl.Double(z))
 	for _, ch := range str {
 		//glut.BitmapCharacter(glut.BITMAP_9_BY_15, string(ch))
 	}
@@ -17,22 +17,20 @@ func Text(x, y, z float32, str string) {
 	gl.Disable(gl.BLEND)
 }
 
-func Number(x, y, z, n float32) {
-	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.Enable(gl.BLEND)
-
+func Float(x, y, z, n float64) {
 	s := ""
-	fmt.Fprintf(s, "%f", n)
-	gl.RasterPos3f(x, y, z)
-	for _, ch := range s {
-		//glut.BitmapCharacter(glut.BITMAP_9_BY_15, string(ch))
-	}
-
-	gl.Disable(gl.BLEND)
+	fmt.Sprintf(s, "%f", n)
+	String(x, y, z, s)
 }
 
-func StrokeText(x, y, z float32, str string) {
+func Int(x, y, z float64, n int) {
+	s := ""
+	fmt.Sprintf(s, "%d", n)
+	String(x, y, z, s)
 }
 
-func StrokeNumber(x, y, z, n float32) {
+func StrokeText(x, y, z float64, str string) {
+}
+
+func StrokeNumber(x, y, z, n float64) {
 }
