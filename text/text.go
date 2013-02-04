@@ -11,6 +11,7 @@ func String(x, y, z float64, str string) {
 
 	gl.RasterPos3d(gl.Double(x), gl.Double(y), gl.Double(z))
 	for _, ch := range str {
+		fmt.Print(ch)
 		//glut.BitmapCharacter(glut.BITMAP_9_BY_15, string(ch))
 	}
 
