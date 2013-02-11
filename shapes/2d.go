@@ -25,6 +25,8 @@ func Triangle(one, two, three Point, solid bool) {
 	gl.End()
 }
 
+// The rectangle is drawn with point one being at the top right
+// and point two being at the bottom left.
 func Rectangle(one, two Point, solid bool) {
 	mode := gl.LINE_LOOP
 	if solid {
@@ -38,6 +40,8 @@ func Rectangle(one, two Point, solid bool) {
 	gl.End()
 }
 
+// The rectangle is drawn with point one being at the top right
+// and point two being at the bottom left.
 func FadeRectangle(one, two Point, horizontal bool) {
 	gl.Begin(gl.QUADS)
 	if horizontal { // Clockwise from top right
@@ -60,16 +64,25 @@ func Circle(r gl.Float, slices int, solid bool) {
 	Ellipse(r, r, slices, solid)
 }
 
+func PartialCircle(r gl.Float, begRad, endRad float64, slices int, solid bool) {
+	PartialEllipse(r, r, begRad, endRad, slices, solid)
+}
+
 func Ellipse(rX, rY gl.Float, slices int, solid bool) {
+	PartialEllipse(rX, rY, 0, 2*math.Pi, slices, solid)
+}
+
+func PartialEllipse(rX, rY gl.Float, beginRad, endRad float64, slices int, solid bool) {
 	mode := gl.LINE_LOOP
 	if solid {
 		mode = gl.POLYGON
 	}
-	res := 2 * math.Pi / float64(slices)
+	res := (endRad - beginRad) / float64(slices)
 	gl.Begin(gl.Enum(mode))
 	gl.Vertex2f(0, 0)
-	for a := 0.0; a < 2*math.Pi; a += res {
+	for a := beginRad; a <= endRad; a += res {
 		gl.Vertex2f(rX*gl.Float(math.Cos(a)), rY*gl.Float(math.Sin(a)))
 	}
+	gl.Vertex2f(rX*gl.Float(math.Cos(endRad)), rY*gl.Float(math.Sin(endRad)))
 	gl.End()
 }
