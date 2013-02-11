@@ -89,6 +89,7 @@ func (o *OpenGl) Init() {
 			o.set3dView()
 			o.display3d()
 		}
+
 		if o.display2d != nil {
 			o.set2dView()
 			o.display2d()

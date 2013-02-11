@@ -6,8 +6,8 @@ import (
 )
 
 type Camera struct {
-	mUp       linAlg.Vector
-	mEye, mAt linAlg.Point
+	mUp                                                  linAlg.Vector
+	mEye, mAt                                            linAlg.Point
 	mUpAngle, mPanAngle, mPanSpeed, mPanAmount, mDx, mDy float64
 	mDragSpeed, mNearPlane, mFarPlane, mDistance, mZoom  float64
 }
@@ -22,7 +22,7 @@ func New(/*eye, at linAlg.Point*/) *Camera {
 
 // Position of the EYE or camera
 func (c *Camera) EYE() linAlg.Point {
-	return c.mEye
+	return c.mEye.Add(c.mAt)
 }
 
 // Point AT which the camera is looking
@@ -64,7 +64,7 @@ func (c *Camera) Move() {
 		Z: 0,
 	}
 	// Forward vector
-	w := c.mAt.Sub(c.mEye)
+	w := linAlg.Vector(c.mAt.Sub(c.mEye))
 
 	c.mUp = v.Cross(w)
 	c.mUp = c.mUp.Unit()
@@ -101,16 +101,37 @@ func (c *Camera) MoveRight() {
 	c.Move()
 }
 
-func (c *Camera) PanUp() {
+func (c *Camera) PanUp(amount float64) {
 }
 
-func (c *Camera) PanDown() {
+func (c *Camera) PanDown(amount float64) {
 }
 
-func (c *Camera) PanLeft() {
+func (c *Camera) PanLeft(amount float64) {
 }
 
-func (c *Camera) PanRight() {
+func (c *Camera) PanRight(amount float64) {
+}
+
+func (c *Camera) SlideUp(amount float64) {
+	c.Slide(linAlg.Vector{0, 0, amount})
+}
+
+func (c *Camera) SlideDown(amount float64) {
+	c.Slide(linAlg.Vector{0, 0, -amount})
+}
+
+func (c *Camera) SlideLeft(amount float64) {
+	c.Slide(linAlg.Vector{0, -amount, 0})
+}
+
+func (c *Camera) SlideRight(amount float64) {
+	c.Slide(linAlg.Vector{0, amount, 0})
+}
+
+func (c *Camera) Slide(v linAlg.Vector) {
+	c.mEye = c.mEye.Add(linAlg.Point(v))
+	c.mAt = c.mAt.Add(linAlg.Point(v))
 }
 
 func (c *Camera) SetPan() {
