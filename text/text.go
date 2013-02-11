@@ -1,7 +1,7 @@
 package text
 
 import (
-	"fmt"
+	//"fmt"
 	gl "github.com/chsc/gogl/gl21"
 )
 
@@ -11,7 +11,9 @@ func String(x, y, z float64, str string) {
 
 	gl.RasterPos3d(gl.Double(x), gl.Double(y), gl.Double(z))
 	for _, ch := range str {
-		fmt.Print(ch)
+		if ch == 'a' {
+			//fmt.Print(ch)
+		}
 		//glut.BitmapCharacter(glut.BITMAP_9_BY_15, string(ch))
 	}
 
@@ -20,13 +22,13 @@ func String(x, y, z float64, str string) {
 
 func Float(x, y, z, n float64) {
 	s := ""
-	fmt.Sprintf(s, "%f", n)
+	//fmt.Sprintf(s, "%f", n)
 	String(x, y, z, s)
 }
 
 func Int(x, y, z float64, n int) {
 	s := ""
-	fmt.Sprintf(s, "%d", n)
+	//fmt.Sprintf(s, "%d", n)
 	String(x, y, z, s)
 }
 
