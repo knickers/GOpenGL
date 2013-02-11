@@ -47,18 +47,30 @@ func display3d() {
 	rotx += 0.5
 	roty += 0.5
 
-	//gl.PushMatrix()
+	gl.PushMatrix()
 	//gl.Translatef(0, 0, -3.0)
-	//gl.Rotatef(rotx, 1, 0, 0)
-	//gl.Rotatef(roty, 0, 1, 0)
+	gl.Rotatef(rotx, 1, 0, 0)
+	gl.Rotatef(roty, 0, 1, 0)
 	colors.Material(colors.White)
-	shapes.Box(1, 1, 0.5, true)
-	//gl.PopMatrix()
+	//shapes.Box(1, 1, 0.5, true)
+	shapes.Cylinder(0.5, 1, 32, false, true)
+	gl.PopMatrix()
 }
 
 func display2d() {
 	gl.Color4f(0, 1, 0, 1)
 	shapes.Rectangle(shapes.Point{100, 100, 0}, shapes.Point{10, 10, 0}, true)
+
+	gl.PushMatrix()
+	gl.Translatef(150, 55, 0)
+	shapes.Circle(50, 3, true)
+	gl.Translatef(120, 0, 0)
+	shapes.Circle(50, 4, true)
+	gl.Translatef(120, 0, 0)
+	shapes.Circle(50, 5, true)
+	gl.Translatef(120, 0, 0)
+	shapes.Circle(50, 6, true)
+	gl.PopMatrix()
 }
 
 func keyboard(key, state int) {
