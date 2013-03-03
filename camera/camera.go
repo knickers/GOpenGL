@@ -2,154 +2,154 @@ package camera
 
 import (
 	"linAlg"
-	"math"
+	//"math"
 )
 
 type Camera struct {
-	mUp                                                  linAlg.Vector
-	mEye, mAt                                            linAlg.Point
-	mUpAngle, mPanAngle, mPanSpeed, mPanAmount, mDx, mDy float64
-	mDragSpeed, mNearPlane, mFarPlane, mDistance, mZoom  float64
+	eye, at                     linAlg.Point
+	up, right                   linAlg.Vector
+	dx, dy                      int
+	near, far, zoom  float64
 }
 
 func New(/*eye, at linAlg.Point*/) *Camera {
 	return &Camera{
-		mEye: linAlg.Point{X: 0, Y: -5, Z: 0},
-		mAt:  linAlg.Point{X: 0, Y: 0, Z: 0},
-		mUp:  linAlg.Vector{X: 0, Y: 0, Z: 1},
+		eye:   linAlg.Point{X: 0, Y: -5, Z: 0},
+		at:    linAlg.Point{X: 0, Y: -0, Z: 0},
+		up:    linAlg.Vector{X: 0, Y: 0, Z: 1},
+		right: linAlg.Vector{X: 1, Y: 0, Z: 0},
+		zoom:  40,
 	}
 }
 
 // Position of the EYE or camera
-func (c *Camera) EYE() linAlg.Point {
-	return c.mEye.Add(c.mAt)
+func (c *Camera) Eye() linAlg.Point {
+	return c.eye
 }
 
 // Point AT which the camera is looking
-func (c *Camera) AT() linAlg.Point {
-	return c.mAt
+func (c *Camera) At() linAlg.Point {
+	return c.at
 }
 
 // The UP vector of the camera
-func (c *Camera) UP() linAlg.Vector {
-	return c.mUp
+func (c *Camera) Up() linAlg.Vector {
+	return c.up
 }
 
-func (c *Camera) Zoom() float64 {
-	return c.mZoom
+// The Right vector of the camera
+func (c *Camera) Right() linAlg.Vector {
+	return c.right
+}
+
+// The Forward vector of the camera
+func (c *Camera) Forward() linAlg.Vector {
+	return c.at.Sub(c.eye)
+}
+
+func (c Camera) Zoom() float64 {
+	return c.zoom
 }
 
 // The near cutoff plane of visibility as a unit of distance from the camera
-func (c *Camera) NearPlane() float64 {
-	return c.mNearPlane
+func (c Camera) NearPlane() float64 {
+	return c.near
 }
 
 // The far cutoff plane of visibility as a unit of distance from the camera
-func (c *Camera) FarPlane() float64 {
-	return c.mFarPlane
+func (c Camera) FarPlane() float64 {
+	return c.far
 }
 
-func (c *Camera) Move() {
-	c.mNearPlane = c.mDistance - 60
-	c.mFarPlane = c.mDistance + 70
-	if c.mNearPlane <= 0 {
-		c.mNearPlane = 0.1
+func (c Camera) MoveIn(amount float64) {
+	c.MoveOut(-amount)
+}
+
+func (c *Camera) MoveOut(amount float64) {
+	l := c.Forward().Length()
+	if l + amount >= 0 {
+		c.eye = c.at.Add(c.Forward().Mul((l + amount) / l))
 	}
-	// Set camera position
-	c.mEye = linAlg.SpherePoint(c.mDistance, c.mUpAngle, c.mPanAngle)
-	// Right vector
-	v := linAlg.Vector{
-		X: math.Cos(c.mPanAngle + math.Pi/2),
-		Y: math.Sin(c.mPanAngle + math.Pi/2),
-		Z: 0,
-	}
-	// Forward vector
-	w := linAlg.Vector(c.mAt.Sub(c.mEye))
-
-	c.mUp = v.Cross(w)
-	c.mUp = c.mUp.Unit()
-	return
 }
 
-func (c *Camera) MoveIn() {
-	c.mDistance -= 5
-	c.Move()
+func (c Camera) SphereUp(amount float64) {
+	c.Sphere(amount, c.right)
 }
 
-func (c *Camera) MoveOut() {
-	c.mDistance += 5
-	c.Move()
+func (c Camera) SphereDown(amount float64) {
+	c.Sphere(-amount, c.right)
 }
 
-func (c *Camera) MoveUp() {
-	c.mUpAngle += c.mPanAmount
-	c.Move()
+func (c Camera) SphereLeft(amount float64) {
+	c.Sphere(amount, c.up)
 }
 
-func (c *Camera) MoveDown() {
-	c.mUpAngle -= c.mPanAmount
-	c.Move()
+func (c Camera) SphereRight(amount float64) {
+	c.Sphere(-amount, c.up)
 }
 
-func (c *Camera) MoveLeft() {
-	c.mPanAngle -= c.mPanAmount
-	c.Move()
+func (c *Camera) Sphere(amount float64, axis linAlg.Vector) {
+	c.eye = c.at.Add(c.Forward().Neg().Rotate(amount, axis))
 }
 
-func (c *Camera) MoveRight() {
-	c.mPanAngle += c.mPanAmount
-	c.Move()
+func (c Camera) PanUp(amount float64) {
+	c.Pan(-amount, c.right)
 }
 
-func (c *Camera) PanUp(amount float64) {
+func (c Camera) PanDown(amount float64) {
+	c.Pan(amount, c.right)
 }
 
-func (c *Camera) PanDown(amount float64) {
+func (c Camera) PanLeft(amount float64) {
+	c.Pan(amount, c.up)
 }
 
-func (c *Camera) PanLeft(amount float64) {
+func (c Camera) PanRight(amount float64) {
+	c.Pan(-amount, c.up)
 }
 
-func (c *Camera) PanRight(amount float64) {
+func (c *Camera) Pan(radians float64, axis linAlg.Vector) {
+	c.up = c.up.Rotate(radians, axis)
+	c.right = c.right.Rotate(radians, axis)
+	forward := c.Forward().Rotate(radians, axis)
+	c.at = c.eye.Add(forward)
 }
 
-func (c *Camera) SlideUp(amount float64) {
-	c.Slide(linAlg.Vector{0, 0, amount})
+func (c Camera) SlideUp(amount float64) {
+	c.Slide(c.up.Mul(amount))
 }
 
-func (c *Camera) SlideDown(amount float64) {
-	c.Slide(linAlg.Vector{0, 0, -amount})
+func (c Camera) SlideDown(amount float64) {
+	c.Slide(c.up.Mul(-amount))
 }
 
-func (c *Camera) SlideLeft(amount float64) {
-	c.Slide(linAlg.Vector{0, -amount, 0})
+func (c Camera) SlideLeft(amount float64) {
+	c.Slide(c.right.Mul(-amount))
 }
 
-func (c *Camera) SlideRight(amount float64) {
-	c.Slide(linAlg.Vector{0, amount, 0})
+func (c Camera) SlideRight(amount float64) {
+	c.Slide(c.right.Mul(amount))
+}
+
+func (c Camera) SlideForward(amount float64) {
+	c.Slide(c.Forward().Mul(-amount))
+}
+
+func (c Camera) SlideBack(amount float64) {
+	c.Slide(c.Forward().Mul(amount))
 }
 
 func (c *Camera) Slide(v linAlg.Vector) {
-	c.mEye = c.mEye.Add(linAlg.Point(v))
-	c.mAt = c.mAt.Add(linAlg.Point(v))
-}
-
-func (c *Camera) SetPan() {
-	return
-}
-
-func (c *Camera) Pan() {
-	c.mPanAngle += c.mPanAmount
-	c.Move()
+	c.eye = c.eye.Add(v)
+	c.at = c.at.Add(v)
 }
 
 func (c *Camera) Click(x, y int) {
-	c.mDx, c.mDy = float64(x), float64(y)
+	c.dx, c.dy = x, y
 }
 
 func (c *Camera) Drag(x, y int) {
-	c.mPanAngle -= float64(x)-c.mDx / c.mDragSpeed
-	c.mUpAngle -= float64(y)-c.mDy / c.mDragSpeed
-	c.mDx, c.mDy = float64(x), float64(y)
-	c.Move()
+	c.SphereRight(float64(c.dx - x))
+	c.SphereUp(float64(c.dy - y))
+	c.dx, c.dy = x, y
 }
