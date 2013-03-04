@@ -61,51 +61,42 @@ func (c Camera) FarPlane() float64 {
 	return c.far
 }
 
-func (c Camera) MoveIn(amount float64) {
-	c.MoveOut(-amount)
-}
-
-func (c *Camera) MoveOut(amount float64) {
+func (c *Camera) MoveCloser(amount float64) {
 	l := c.Forward().Length()
 	if l + amount >= 0 {
-		c.eye = c.at.Add(c.Forward().Mul((l + amount) / l))
+		c.eye = c.at.Add(c.Forward().Mul((l - amount) / l))
 	}
 }
 
-func (c Camera) SphereUp(amount float64) {
+func (c Camera) SpherePitch(amount float64) {
 	c.Sphere(amount, c.right)
 }
 
-func (c Camera) SphereDown(amount float64) {
-	c.Sphere(-amount, c.right)
-}
-
-func (c Camera) SphereLeft(amount float64) {
+func (c Camera) SphereYaw(amount float64) {
 	c.Sphere(amount, c.up)
 }
 
-func (c Camera) SphereRight(amount float64) {
-	c.Sphere(-amount, c.up)
+func (c Camera) SphereRoll(amount float64) {
+	c.Sphere(amount, c.Forward())
 }
 
 func (c *Camera) Sphere(amount float64, axis linAlg.Vector) {
+	c.up = c.up.Rotate(amount, axis)
+	c.right = c.right.Rotate(amount, axis)
 	c.eye = c.at.Add(c.Forward().Neg().Rotate(amount, axis))
 }
 
-func (c Camera) PanUp(amount float64) {
-	c.Pan(-amount, c.right)
-}
-
-func (c Camera) PanDown(amount float64) {
+// Rotate up and down about the left to right axis
+func (c Camera) PanPitch(amount float64) {
 	c.Pan(amount, c.right)
 }
 
-func (c Camera) PanLeft(amount float64) {
+func (c Camera) PanYaw(amount float64) {
 	c.Pan(amount, c.up)
 }
 
-func (c Camera) PanRight(amount float64) {
-	c.Pan(-amount, c.up)
+func (c Camera) PanRoll(amount float64) {
+	c.Pan(amount, c.Forward())
 }
 
 func (c *Camera) Pan(radians float64, axis linAlg.Vector) {
@@ -123,20 +114,12 @@ func (c Camera) SlideDown(amount float64) {
 	c.Slide(c.up.Mul(-amount))
 }
 
-func (c Camera) SlideLeft(amount float64) {
-	c.Slide(c.right.Mul(-amount))
-}
-
 func (c Camera) SlideRight(amount float64) {
 	c.Slide(c.right.Mul(amount))
 }
 
 func (c Camera) SlideForward(amount float64) {
-	c.Slide(c.Forward().Mul(-amount))
-}
-
-func (c Camera) SlideBack(amount float64) {
-	c.Slide(c.Forward().Mul(amount))
+	c.Slide(c.Forward().Unit().Mul(amount))
 }
 
 func (c *Camera) Slide(v linAlg.Vector) {
@@ -149,7 +132,7 @@ func (c *Camera) Click(x, y int) {
 }
 
 func (c *Camera) Drag(x, y int) {
-	c.SphereRight(float64(c.dx - x))
-	c.SphereUp(float64(c.dy - y))
+	c.SpherePitch(float64(c.dy - y))
+	c.SphereYaw(float64(c.dx - x))
 	c.dx, c.dy = x, y
 }
